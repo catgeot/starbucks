@@ -14,26 +14,48 @@ searchInputEl.addEventListener('blur', function() {
 	searchInputEl.setAttribute('placeholder', '');
 });
 
-const badgeEl = document.querySelector('header .badges');
+/**
+ * 페이지 스크롤에 따른 요소 제어
+ */
+// 페이지 스크롤에 영향을 받는 요소들을 검색!
+const badgeEl = document.querySelector('header .badges')
+const toTopEl = document.querySelector('#to-top')
+// 페이지에 스크롤 이벤트를 추가!
+// 스크롤이 지나치게 자주 발생하는 것을 조절(throttle, 일부러 부하를 줌)
+window.addEventListener('scroll', _.throttle(function () {
+  // 페이지 스크롤 위치가 500px이 넘으면.
+  if (window.scrollY > 500) {
+    // Badge 요소 숨기기!
+    gsap.to(badgeEl, .6, {
+      opacity: 0,
+      display: 'none'
+    })
+    // 상단으로 스크롤 버튼 보이기!
+    gsap.to(toTopEl, .2, {
+      x: 0
+    })
 
-window.addEventListener('scroll', _.throttle(function() {
-	console.log(window.scrollY);
-	if (window.scrollY > 500) {
-		//배지 숨기기
-		// gsap.to(요소, 지속시간, {옵션});
-		gsap.to(badgeEl, 0.6, {
-			opacity: 0,
-			display: 'none'
-		});
-	}else{
-		//배지 보이기
-		gsap.to(badgeEl, 0.6, {
-			opacity: 1,
-			display: 'block'
-		});
-	}	
-}, 300));
-//_.throttle(함수, 시간)
+  // 페이지 스크롤 위치가 500px이 넘지 않으면.
+  } else {
+    // Badge 요소 보이기!
+    gsap.to(badgeEl, .6, {
+      opacity: 1,
+      display: 'block'
+    })
+    // 상단으로 스크롤 버튼 숨기기!
+    gsap.to(toTopEl, .2, {
+      x: 100
+    })
+  }
+}, 300))
+// 상단으로 스크롤 버튼을 클릭하면,
+toTopEl.addEventListener('click', function () {
+  // 페이지 위치를 최상단으로 부드럽게(0.7초 동안) 이동.
+  gsap.to(window, .7, {
+    scrollTo: 0
+  })
+})
+
 
 const fadeEls = document.querySelectorAll('.visual .fade-in');
 fadeEls.forEach(function(fadeEl, index) {
@@ -56,16 +78,26 @@ new Swiper('.promotion .swiper-container', {
 	spaceBetween: 10, //슬라이드 사이 여백
 	centeredSlides: true, //1번 슬라이드가 가운데 보이기
 	loop: true,
-	// autoplay: {
-	// 	delay: 5000
-	// },
+	autoplay: {
+		delay: 5000
+	},
 	pagination: {
 		el: '.promotion .swiper-pagination', //페이지 번호 요소 선택자
-		clickable: true, //사용자 페이지 번호 요소 제어 가능 여부
+		clickable: true //사용자 페이지 번호 요소 제어 가능 여부
 	},
 	navigation: {
 		prevEl: '.promotion .swiper-prev',
-		nextEl:'.promotion .swiper-next'
+		nextEl: '.promotion .swiper-next'
+	}
+});
+new Swiper('.awards .swiper-container', {
+	autoplay: true,
+	loop: true,
+	spaceBetween: 30,
+	slidesPerView: 5,
+	navigation: {
+		prevEl:'.awards .swiper-prev',
+		nextEl:'.awards .swiper-next'
 	}
 });
 
@@ -73,7 +105,7 @@ new Swiper('.promotion .swiper-container', {
 const promotionEl = document.querySelector('.promotion');
 const promotionToggleBtn = document.querySelector('.toggle-promotion');
 let isHidePromotion = false;
-promotionToggleBtn,addEventListener('click', function () {
+promotionToggleBtn.addEventListener('click', function () {
 	isHidePromotion = !isHidePromotion
 	if (isHidePromotion) {
 		//숨김 처리!
@@ -120,3 +152,6 @@ spyEls.forEach(function (spyEl) {
 		.setClassToggle(spyEl, 'show')
 		.addTo(new ScrollMagic.Controller());
 });
+
+const thisYear = document.querySelector('.this-year')
+thisYear.textContent = new Date().getFullYear();
